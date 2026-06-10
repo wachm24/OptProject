@@ -6,5 +6,5 @@ from pymongo import MongoClient
 client = MongoClient(os.environ["MONGO_URI"])
 db = client.notes_db
 notes_collection = db["notes"]
-
 folders_collection = db["folders"]
+users_collection = db["users"]

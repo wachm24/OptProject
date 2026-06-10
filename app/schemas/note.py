@@ -28,9 +28,10 @@ def noteEntity(item) -> dict:
         "_id": str(item.get("_id", "")),
         "title": item.get("title", ""),
         "desc": item.get("desc", ""),
+        "private": item.get("private", False),
         "important": item.get("important", False),
         "created_at": formatted_time,
-        "folder_id": item.get("folder_id", None),  # DODANE
+        "folder_id": item.get("folder_id", None)
     }
 
 

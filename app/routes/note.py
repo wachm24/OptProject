@@ -5,7 +5,7 @@ from bson import ObjectId
 from bson.errors import InvalidId
 from datetime import datetime, timezone, timedelta
 from typing import Optional
-from config.db import notes_collection, folders_collection
+from config.db import notes_collection, folders_collection, users_collection
 from schemas.note import noteEntity, notesEntity
 from routes.deps import get_current_user
 
@@ -36,12 +36,25 @@ async def read_item(request: Request):
     folder_docs = folders_collection.find({"user_id": user["id"]})
     all_folders = [{"_id": str(f["_id"]), "name": f.get("name", "")} for f in folder_docs]
 
+    raw_users = list(users_collection.find({}, {"_id": 1, "name": 1}))
+    all_users = []
+    for u in raw_users:
+        uid = str(u["_id"])
+        count = notes_collection.count_documents({"user_id": uid})
+        all_users.append({
+            "_id": uid,
+            "name": u.get("name", ""),
+            "note_count": count,
+        })
+
     return templates.TemplateResponse("index.html", {
         "request": request,
         "newDocs": all_notes,
         "folders": all_folders,
         "user": user,
+        "all_users": all_users,   # ← NOWE
     })
+
 
 
 # POST new note
@@ -52,6 +65,7 @@ def add_note(
     desc: str = Form(...),
     important: bool = Form(False),
     folder_id: Optional[str] = Form(None),
+    private: bool = Form(False)
 ):
     user, redirect = require_user(request)
     if redirect:
@@ -61,6 +75,7 @@ def add_note(
     notes_collection.insert_one({
         "title": title,
         "desc": desc,
+        "private": private,
         "important": important,
         "created_at": created_at,
         "updated_at": created_at,
@@ -103,6 +118,7 @@ async def update_note(
     note_id: str,
     title: str = Form(...),
     desc: str = Form(...),
+    private: bool = Form(False),    
     important: bool = Form(False),
     folder_id: Optional[str] = Form(None),
 ):
@@ -121,6 +137,7 @@ async def update_note(
         {"$set": {
             "title": title,
             "desc": desc,
+            "private": private,    
             "important": important,
             "updated_at": updated_at,
             "folder_id": folder_id if folder_id else None,
@@ -150,3 +167,37 @@ async def delete_note(request: Request, note_id: str):
         raise HTTPException(status_code=404, detail="Note not found")
 
     return RedirectResponse("/", status_code=303)
+
+
+
+from fastapi.responses import JSONResponse
+
+@note.get("/user/{user_id}/notes")
+async def get_user_notes(user_id: str, request: Request):
+    user, redirect = require_user(request)
+    if redirect:
+        return redirect
+    
+    query = {"user_id": user_id}
+    if user_id != user["id"]:
+        query["private"] = {"$ne": True}
+
+    docs = notes_collection.find({"user_id": user_id})
+    result = []
+    for doc in docs:
+        result.append({
+            "id": str(doc["_id"]),
+            "title": doc.get("title", ""),
+            "desc": doc.get("desc", ""),
+            "private": doc.get("private", False),
+            "important": doc.get("important", False),
+            "created_at": str(doc.get("created_at", "")),
+        })
+
+    return JSONResponse(content=result)
+
+
+
+
+
+
