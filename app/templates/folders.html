@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Folders</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container { max-width: 800px; margin: 0 auto; }
+
+        .header { text-align: center; margin-bottom: 40px; color: white; }
+        .header h1 { font-size: 2.5rem; margin-bottom: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .header p { font-size: 1.1rem; opacity: 0.9; }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-decoration: none;
+            background: rgba(255,255,255,0.1);
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+        .back-link:hover { background: rgba(255,255,255,0.2); transform: translateX(-5px); }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.25); }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #555; }
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background: #f8f9fa;
+            font-family: inherit;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: white;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4); }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+        .btn-danger:hover { background: #c82333; transform: translateY(-1px); }
+
+        .folders-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .folders-header h2 { color: white; font-size: 1.8rem; }
+        .folders-count {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .folder-item {
+            background: white;
+            border-radius: 12px;
+            padding: 20px 25px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 4px solid #764ba2;
+            transition: all 0.3s ease;
+            animation: slideIn 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .folder-item:hover { transform: translateX(5px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .folder-info { flex: 1; }
+        .folder-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #333;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .folder-name:hover { color: #667eea; }
+        .folder-count-badge {
+            background: #f0f0f0;
+            color: #666;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .empty-state { text-align: center; padding: 60px 20px; color: white; }
+        .empty-state p { opacity: 0.7; font-size: 1.1rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← Back to Notes</a>
+
+        <div class="header">
+            <h1>📁 Folders</h1>
+            <p>Organize your notes into folders</p>
+        </div>
+
+        <!-- Create folder form -->
+        <div class="card">
+            <form action="/folders" method="post">
+                <div class="form-group">
+                    <label for="name">New Folder Name</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="e.g. Work, Personal, Ideas..." required>
+                </div>
+                <button type="submit" class="btn btn-primary">📁 Create Folder</button>
+            </form>
+        </div>
+
+        <!-- Folders list -->
+        <div class="folders-header">
+            <h2>All Folders</h2>
+            <span class="folders-count">
+                {% if folders %}
+                    {{ folders|length }} {{ 'folder' if folders|length == 1 else 'folders' }}
+                {% else %}
+                    0 folders
+                {% endif %}
+            </span>
+        </div>
+
+        {% if folders %}
+            {% for f in folders %}
+                <div class="folder-item">
+                    <div class="folder-info">
+                        <a href="/folders/{{ f._id }}" class="folder-name">
+                            📂 {{ f.name }}
+                            <span class="folder-count-badge">{{ f.note_count }} {{ 'note' if f.note_count == 1 else 'notes' }}</span>
+                        </a>
+                    </div>
+                    <form action="/folders/{{ f._id }}/delete" method="post" onsubmit="return confirm('Delete folder and all its notes?')">
+                        <button type="submit" class="btn btn-danger">🗑️ Delete</button>
+                    </form>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <p>No folders yet. Create one above!</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
