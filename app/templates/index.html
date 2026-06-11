@@ -784,7 +784,7 @@
 
                 <div class="form-check">
                     <input type="checkbox" class="form-check-input" id="important" name="important">
-                    <label class="form-check-label" for="important">Important</label>
+                    <label class="form-check-label" for="important">⭐ Important</label>
                 </div>
 
 
@@ -964,7 +964,7 @@
 
     <div class="panel-overlay" id="panelOverlay" onclick="closePanel()"></div>
 
-    <!-- Panel notatek użytkownika -->
+
     <div class="user-notes-panel" id="userNotesPanel">
         <div class="panel-header">
             <h3 id="panelUserName">Notatki</h3>
@@ -988,12 +988,12 @@
         });
 
         async function openPanel(userId, userName, clickedItem) {
-            // Podświetl wybranego usera
+
             if (activeUserItem) activeUserItem.classList.remove('selected-user');
             activeUserItem = clickedItem;
             clickedItem.classList.add('selected-user');
 
-            // Pokaż panel i overlay
+       
             document.getElementById('panelUserName').textContent = `📋 ${userName}`;
             document.getElementById('panelContent').innerHTML = '<p class="panel-loading">Loading..</p>';
             document.getElementById('userNotesPanel').style.display = 'block';
@@ -1017,17 +1017,17 @@
                 return;
             }
 
-            // Zapisz notatki globalnie żeby mieć dostęp w modalu
+
             window._panelNotes = notes;
 
             container.innerHTML = notes.map((n, index) => `
                 <div class="panel-note-item" onclick="openNoteModal(${index})">
                     <div class="panel-note-title">
                         ${escapeHtml(n.title || 'Untitled')}
-                        ${n.important ? '<span class="panel-note-important">⭐ Ważna</span>' : ''}
+                        ${n.important ? '<span class="panel-note-important">⭐ Important</span>' : ''}
                     </div>
                     ${n.desc ? `<div class="panel-note-desc">${escapeHtml(n.desc)}</div>` : ''}
-                    ${n.created_at ? `<div class="panel-note-date">📅 ${n.created_at}</div>` : ''}
+                    ${n.created_at ? `<div class="panel-note-date">📅 ${n.created_at.split('.')[0]}</div>` : ''}
                 </div>
             `).join('');
         }
@@ -1037,17 +1037,17 @@
             if (!n) return;
 
             document.getElementById('noteModalContent').innerHTML = `
-                ${n.important ? '<div class="note-modal-important">⭐ Ważna</div>' : ''}
+                ${n.important ? '<div class="note-modal-important">⭐ Important</div>' : ''}
                 <div class="note-modal-title">${escapeHtml(n.title || 'Untitled')}</div>
                 ${n.desc ? `<div class="note-modal-desc">${escapeHtml(n.desc)}</div>` : ''}
-                ${n.created_at ? `<div class="note-modal-date">📅 Crated: ${n.created_at}</div>` : ''}
+                ${n.created_at ? `<div class="note-modal-date">📅 Crated: ${n.created_at.split('.')[0]}</div>` : ''}
             `;
 
             document.getElementById('noteModalOverlay').classList.add('active');
         }
 
         function closeNoteModal(event) {
-            // Zamknij tylko jeśli kliknięto overlay (nie sam modal)
+
             if (event && event.target !== document.getElementById('noteModalOverlay')) return;
             document.getElementById('noteModalOverlay').classList.remove('active');
         }
@@ -1066,7 +1066,7 @@
             return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
         }
 
-        // Zamknij panelem klawiszem Escape
+
         document.addEventListener('keydown', e => {
             if (e.key === 'Escape') {
                 document.getElementById('noteModalOverlay').classList.remove('active');

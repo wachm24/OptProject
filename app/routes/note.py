@@ -64,19 +64,18 @@ def add_note(
     title: str = Form(...),
     desc: str = Form(...),
     important: bool = Form(False),
+    private: bool = Form(False),
     folder_id: Optional[str] = Form(None),
-    private: bool = Form(False)
 ):
     user, redirect = require_user(request)
     if redirect:
         return redirect
-
     created_at = datetime.now(IST)
     notes_collection.insert_one({
         "title": title,
         "desc": desc,
-        "private": private,
         "important": important,
+        "private": private,
         "created_at": created_at,
         "updated_at": created_at,
         "folder_id": folder_id if folder_id else None,
@@ -177,23 +176,20 @@ async def get_user_notes(user_id: str, request: Request):
     user, redirect = require_user(request)
     if redirect:
         return redirect
-    
-    query = {"user_id": user_id}
-    if user_id != user["id"]:
-        query["private"] = {"$ne": True}
-
-    docs = notes_collection.find({"user_id": user_id})
+    if user["id"] == user_id:
+        query = {"user_id": user_id}
+    else:
+        query = {"user_id": user_id, "private": {"$ne": True}}  # ← FILTR
+    docs = notes_collection.find(query)
     result = []
     for doc in docs:
         result.append({
             "id": str(doc["_id"]),
             "title": doc.get("title", ""),
             "desc": doc.get("desc", ""),
-            "private": doc.get("private", False),
             "important": doc.get("important", False),
             "created_at": str(doc.get("created_at", "")),
         })
-
     return JSONResponse(content=result)
 
 
