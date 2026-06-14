@@ -1,1 +1,0 @@
-NOTE_COLLECTION = "notes"
